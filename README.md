@@ -1,9 +1,21 @@
 # Capstone-project-2024
 
-2102418
- ##:blue_car:
-Car e-commerce website
+# Car E-commerce Website
+#2102418
+## Key Features
 
-+Key features+
-- MERN STACK
+- **MERN STACK**
+- **Tailwind CSS**
+
+### Technologies Used
+- MongoDB
+- Express.js
+- React
+- Node.js
 - Tailwind CSS
+
+### Setup Instructions
+1. Clone the repository.
+2. Install dependencies using `npm install`.
+3. Start the development server with `npm start`.
+
