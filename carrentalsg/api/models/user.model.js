@@ -18,8 +18,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required:true,
        
-    }
+    },
+    avatar: {
+        type : String,
+        default: "https://www.pngall.com/wp-content/uploads/12/Avatar-No-Background.png"
 
+},
 
 },
 {timestamps:true}
