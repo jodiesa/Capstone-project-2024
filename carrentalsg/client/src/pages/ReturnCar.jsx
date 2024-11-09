@@ -326,7 +326,7 @@ export default function CreateListing() {
                   onClick={() => handleRemoveImage(index)}
                   className='p-3 text-red-700 rounded-lg uppercase hover:opacity-75'
                 >
-                  Delete
+                  Deletes
                 </button>
               </div>
             ))}

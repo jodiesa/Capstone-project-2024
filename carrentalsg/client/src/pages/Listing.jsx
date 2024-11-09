@@ -13,6 +13,10 @@ import {
   FaMapMarkerAlt,
   FaParking,
   FaShare,
+  FaBicycle,
+  FaCarAlt,
+  FaCalendarCheck,
+  FaRegThumbsUp
 } from 'react-icons/fa';
 import Contact from '../components/Contact';
 
@@ -122,7 +126,7 @@ export default function Listing() {
                   : `${listing.bedrooms} bed `}
               </li>
               <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaBath className='text-lg' />
+                <FaCalendarCheck className='text-lg' />
                 {listing.bathrooms > 1
                   ? `${listing.bathrooms} baths `
                   : `${listing.bathrooms} bath `}
@@ -132,7 +136,7 @@ export default function Listing() {
                 {listing.parking ? 'Parking spot' : 'No Parking'}
               </li>
               <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaChair className='text-lg' />
+                <FaCarAlt className='text-lg' />
                 {listing.furnished ? 'Furnished' : 'Unfurnished'}
               </li>
             </ul>
