@@ -16,7 +16,8 @@ import {
   FaBicycle,
   FaCarAlt,
   FaCalendarCheck,
-  FaRegThumbsUp
+  FaRegThumbsUp,
+  FaUser 
 } from 'react-icons/fa';
 import Contact from '../components/Contact';
 
@@ -102,7 +103,7 @@ export default function Listing() {
             </p>
             <p className='flex items-center mt-6 gap-2 text-slate-600  text-sm'>
               <FaMapMarkerAlt className='text-green-700' />
-              {listing.address}
+              {listing.location}
             </p>
             <div className='flex gap-4'>
               <p className='bg-red-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
@@ -118,6 +119,10 @@ export default function Listing() {
               <span className='font-semibold text-black'>Description - </span>
               {listing.description}
             </p>
+            <p className='text-slate-800'>
+              <span className='font-semibold text-black'>Model - </span>
+              {listing.model}
+            </p>
             <ul className='text-green-900 font-semibold text-sm flex flex-wrap items-center gap-4 sm:gap-6'>
               <li className='flex items-center gap-1 whitespace-nowrap '>
                 <FaBed className='text-lg' />
@@ -126,18 +131,34 @@ export default function Listing() {
                   : `${listing.bedrooms} bed `}
               </li>
               <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaCalendarCheck className='text-lg' />
-                {listing.bathrooms > 1
-                  ? `${listing.bathrooms} baths `
-                  : `${listing.bathrooms} bath `}
+                <FaBed className='text-lg' />
+                {listing.minAge > 1
+                  ? `${listing.minAge} min Age `
+                  : `${listing.minAge} min Age `}
               </li>
               <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaParking className='text-lg' />
-                {listing.parking ? 'Parking spot' : 'No Parking'}
+                <FaUser className='text-lg' />
+                {listing.pax > 1
+                  ? `${listing.pax} People Maximum `
+                  : `${listing.pax} person `}
               </li>
+             
+              {/* Conditionally render based on fuelType */}
+  {listing.fuelType === 'electronic' ? (
+    <li className='flex items-center gap-1 whitespace-nowrap '>
+      <FaBicycle className='text-lg' />
+      Electronic
+    </li>
+  ) : (
+    <li className='flex items-center gap-1 whitespace-nowrap '>
+      <FaShare className='text-lg' />
+      Petrol
+    </li>
+  )}
+             
               <li className='flex items-center gap-1 whitespace-nowrap '>
                 <FaCarAlt className='text-lg' />
-                {listing.furnished ? 'Furnished' : 'Unfurnished'}
+                {listing.furnished ? 'Drive to Malaysia Allowed' : 'Not allowed in Malaysia'}
               </li>
             </ul>
             {currentUser && listing.userRef !== currentUser._id && !contact && (

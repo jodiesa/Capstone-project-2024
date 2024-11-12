@@ -72,16 +72,16 @@ export const getListings = async (req, res, next) => {
       offer = { $in: [false, true] };
     }
 
-    let furnished = req.query.furnished;
+    let driveToMalaysia = req.query.driveToMalaysia;
 
-    if (furnished === undefined || furnished === 'false') {
-      furnished = { $in: [false, true] };
+    if (driveToMalaysia === undefined || driveToMalaysia === 'false') {
+      driveToMalaysia = { $in: [false, true] };
     }
 
-    let parking = req.query.parking;
+    let fuelType = req.query.fuelType;
 
-    if (parking === undefined || parking === 'false') {
-      parking = { $in: [false, true] };
+    if (fuelType === undefined || fuelType === 'all') {
+      fuelType = { $in: ['petrol', 'electronic'] };
     }
 
     let type = req.query.type;

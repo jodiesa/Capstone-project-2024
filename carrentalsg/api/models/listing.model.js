@@ -10,7 +10,7 @@ const listingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    address: {
+    location: {
       type: String,
       required: true,
     },
@@ -22,28 +22,38 @@ const listingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    bathrooms: {
-      type: Number,
-      required: true,
-    },
-    bedrooms: {
-      type: Number,
-      required: true,
-    },
-    furnished: {
-      type: Boolean,
-      required: true,
-    },
-    parking: {
-      type: Boolean,
-      required: true,
-    },
-    type: {
+    model: {
       type: String,
       required: true,
     },
-    offer: {
+    color: {
+      type: String,
+      required: true,
+    },
+   type:{
+    type: String,
+    required : true,
+   },
+   offer: {
+    type: Boolean,
+    required: true,
+   },
+    driveToMalaysia: {
       type: Boolean,
+      required: true,
+    },
+    fuelType:
+  {
+    type: String,
+    required:true,
+  },
+
+  minAge:{
+    type:Number,
+    required:true,
+  },
+    pax: {
+      type: Number,
       required: true,
     },
     imageUrls: {
