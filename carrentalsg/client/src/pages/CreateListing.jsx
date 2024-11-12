@@ -88,10 +88,10 @@ export default function CreateListing() {
   
     if (id === 'sale' || id === 'rent') {
       setFormData((prev) => ({ ...prev, type: id }));
-    } else if (['parking', 'furnished', 'offer', 'driveToMalaysia'].includes(id)) {
+    } else if ([ 'offer', 'driveToMalaysia'].includes(id)) {
       setFormData((prev) => ({ ...prev, [id]: checked }));
     } else if (id === 'fuelType') {
-      // Handle fuelType as a radio button value
+      // Handle fuelType as a check button value
       setFormData((prev) => ({ ...prev, fuelType: value }));
     } else if (['number', 'text', 'textarea'].includes(type)) {
       setFormData((prev) => ({ ...prev, [id]: value }));
