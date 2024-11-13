@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore from 'swiper';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore from 'swiper';
 import 'swiper/css/bundle';
 import {
   FaBath,
@@ -21,8 +21,6 @@ import {
 } from 'react-icons/fa';
 import Contact from '../components/Contact';
 
-// https://sabe.io/blog/javascript-format-numbers-commas#:~:text=The%20best%20way%20to%20format,format%20the%20number%20with%20commas.
-
 export default function Listing() {
   SwiperCore.use([Navigation]);
   const [listing, setListing] = useState(null);
@@ -30,7 +28,9 @@ export default function Listing() {
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
   const [contact, setContact] = useState(false);
+  const [isBooked, setIsBooked] = useState(false);
   const params = useParams();
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -45,6 +45,7 @@ export default function Listing() {
           return;
         }
         setListing(data);
+        setIsBooked(!data.isAvailable); // Check if listing is already booked
         setLoading(false);
         setError(false);
       } catch (error) {
@@ -55,13 +56,35 @@ export default function Listing() {
     fetchListing();
   }, [params.listingId]);
 
+  const handleBooking = async () => {
+    try {
+      const res = await fetch(`/api/listing/book/${params.listingId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setIsBooked(true); // Mark listing as booked in the frontend
+        setListing((prev) => ({ ...prev, isAvailable: false }));
+        navigate('/'); // Redirect to homepage
+      } else {
+        setError(data.message);
+      }
+    } catch (error) {
+      setError('Booking failed. Please try again.');
+    }
+  };
+
+  const isListingOwner = currentUser && listing && listing.userRef === currentUser._id;
+
   return (
     <main>
       {loading && <p className='text-center my-7 text-2xl'>Loading...</p>}
-      {error && (
-        <p className='text-center my-7 text-2xl'>Something went wrong!</p>
-      )}
-      {listing && !loading && !error && (
+      {error && <p className='text-center my-7 text-2xl'>Something went wrong!</p>}
+      {listing && !isBooked && (
         <div>
           <Swiper navigation>
             {listing.imageUrls.map((url) => (
@@ -124,36 +147,28 @@ export default function Listing() {
               {listing.model}
             </p>
             <ul className='text-green-900 font-semibold text-sm flex flex-wrap items-center gap-4 sm:gap-6'>
-            
               <li className='flex items-center gap-1 whitespace-nowrap '>
                 <FaBed className='text-lg' />
-                {listing.minAge > 1
-                  ? `${listing.minAge} min Age `
-                  : `${listing.minAge} min Age `}
+                {listing.minAge} min Age
               </li>
               <li className='flex items-center gap-1 whitespace-nowrap '>
                 <FaUser className='text-lg' />
-                {listing.pax > 1
-                  ? `${listing.pax} People Maximum `
-                  : `${listing.pax} person `}
+                {listing.pax} People Maximum
               </li>
-             
-              {/* Conditionally render based on fuelType */}
-  {listing.fuelType === 'electronic' ? (
-    <li className='flex items-center gap-1 whitespace-nowrap '>
-      <FaBicycle className='text-lg' />
-      Electronic
-    </li>
-  ) : (
-    <li className='flex items-center gap-1 whitespace-nowrap '>
-      <FaShare className='text-lg' />
-      Petrol
-    </li>
-  )}
-             
+              {listing.fuelType === 'electronic' ? (
+                <li className='flex items-center gap-1 whitespace-nowrap '>
+                  <FaBicycle className='text-lg' />
+                  Electronic
+                </li>
+              ) : (
+                <li className='flex items-center gap-1 whitespace-nowrap '>
+                  <FaShare className='text-lg' />
+                  Petrol
+                </li>
+              )}
               <li className='flex items-center gap-1 whitespace-nowrap '>
                 <FaCarAlt className='text-lg' />
-                {listing.furnished ? 'Drive to Malaysia Allowed' : 'Not allowed in Malaysia'}
+                {listing.driveToMalaysia ? 'Drive to Malaysia Allowed' : 'Not allowed in Malaysia'}
               </li>
             </ul>
             {currentUser && listing.userRef !== currentUser._id && !contact && (
@@ -166,7 +181,21 @@ export default function Listing() {
             )}
             {contact && <Contact listing={listing} />}
           </div>
+
+          {/* Book Button */}
+          <button
+            onClick={handleBooking}
+            className={`bg-blue-500 text-white rounded-lg px-4 py-2 mt-4 ${isListingOwner ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isListingOwner}
+            title={isListingOwner ? 'You cannot book your own listing' : 'Book this listing'}
+          >
+            Book
+          </button>
         </div>
+      )}
+
+      {isBooked && (
+        <p className='text-center my-7 text-2xl'>This listing has been booked and is no longer available.</p>
       )}
     </main>
   );

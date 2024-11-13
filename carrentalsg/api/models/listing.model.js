@@ -56,6 +56,11 @@ const listingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+
+    isAvailable: {
+      type: Boolean,
+      required: true,
+    },
     imageUrls: {
       type: Array,
       required: true,

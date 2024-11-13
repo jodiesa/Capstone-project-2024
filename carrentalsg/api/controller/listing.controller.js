@@ -3,12 +3,18 @@ import { errorHandler } from '../utils/error.js';
 
 export const createListing = async (req, res, next) => {
   try {
-    const listing = await Listing.create(req.body);
+    // Ensure `isAvailable` is set to true when creating a new listing
+    const listingData = { ...req.body, isAvailable: true };
+    
+    // Create the listing with `isAvailable` set to true
+    const listing = await Listing.create(listingData);
+    
     return res.status(201).json(listing);
   } catch (error) {
     next(error);
   }
 };
+
 
 export const deleteListing = async (req, res, next) => {
   const listing = await Listing.findById(req.params.id);
@@ -99,8 +105,7 @@ export const getListings = async (req, res, next) => {
     const listings = await Listing.find({
       name: { $regex: searchTerm, $options: 'i' },
       offer,
-      furnished,
-      parking,
+  
       type,
     })
       .sort({ [sort]: order })
@@ -110,5 +115,30 @@ export const getListings = async (req, res, next) => {
     return res.status(200).json(listings);
   } catch (error) {
     next(error);
+  }
+};
+
+export const bookListing = async (req, res, next) => {
+  try {
+    // Find the listing by ID
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) {
+      return next(errorHandler(404, 'Listing not found!'));
+    }
+
+    // Check if listing is already booked
+    if (!listing.isAvailable) {
+      return res.status(400).json({ success: false, message: 'Listing is already booked' });
+    }
+
+    // Mark listing as unavailable
+    listing.isAvailable = false;
+    await listing.save();
+
+    // Return a success response
+    res.status(200).json({ success: true, message: 'Listing booked successfully', listing });
+  } catch (error) {
+    console.error(error);
+    next(errorHandler(500, 'Booking failed'));
   }
 };

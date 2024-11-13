@@ -22,7 +22,8 @@ export default function CreateListing() {
     fuelType:'petrol',
     driveToMalaysia: true,
     pax: 5,
-    minAge:20
+    minAge:20,
+    isAvailable:true
     
   });
   const [imageUploadError, setImageUploadError] = useState(false);
