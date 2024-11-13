@@ -45,7 +45,7 @@ export default function Listing() {
           return;
         }
         setListing(data);
-        setIsBooked(!data.isAvailable); // Check if listing is already booked
+        setIsBooked(!data.isAvailable); // Reflect the latest availability status
         setLoading(false);
         setError(false);
       } catch (error) {
@@ -53,8 +53,11 @@ export default function Listing() {
         setLoading(false);
       }
     };
+  
+    // Fetch listing when component mounts or when params.listingId changes
     fetchListing();
   }, [params.listingId]);
+  
 
   const handleBooking = async () => {
     try {
@@ -84,8 +87,13 @@ export default function Listing() {
     <main>
       {loading && <p className='text-center my-7 text-2xl'>Loading...</p>}
       {error && <p className='text-center my-7 text-2xl'>Something went wrong!</p>}
-      {listing && !isBooked && (
+      {listing && (
         <div>
+          {isBooked && (
+            <div className="bg-red-800 text-white text-center p-2 uppercase font-semibold">
+              This listing is booked and no longer available for booking.
+            </div>
+          )}
           <Swiper navigation>
             {listing.imageUrls.map((url) => (
               <SwiperSlide key={url}>
@@ -183,19 +191,17 @@ export default function Listing() {
           </div>
 
           {/* Book Button */}
-          <button
-            onClick={handleBooking}
-            className={`bg-blue-500 text-white rounded-lg px-4 py-2 mt-4 ${isListingOwner ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={isListingOwner}
-            title={isListingOwner ? 'You cannot book your own listing' : 'Book this listing'}
-          >
-            Book
-          </button>
+          {!isBooked && (
+            <button
+              onClick={handleBooking}
+              className={`bg-blue-500 text-white rounded-lg px-4 py-2 mt-4 ${isListingOwner ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={isListingOwner}
+              title={isListingOwner ? 'You cannot book your own listing' : 'Book this listing'}
+            >
+              Book
+            </button>
+          )}
         </div>
-      )}
-
-      {isBooked && (
-        <p className='text-center my-7 text-2xl'>This listing has been booked and is no longer available.</p>
       )}
     </main>
   );

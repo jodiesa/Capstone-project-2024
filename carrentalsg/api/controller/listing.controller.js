@@ -122,23 +122,56 @@ export const bookListing = async (req, res, next) => {
   try {
     // Find the listing by ID
     const listing = await Listing.findById(req.params.id);
-    if (!listing) {
-      return next(errorHandler(404, 'Listing not found!'));
-    }
+    if (!listing) return next(errorHandler(404, 'Listing not found!'));
 
-    // Check if listing is already booked
+    // Check if the listing is already booked
     if (!listing.isAvailable) {
       return res.status(400).json({ success: false, message: 'Listing is already booked' });
     }
 
-    // Mark listing as unavailable
+    // Mark the listing as unavailable and assign `bookedBy` to the user making the booking
     listing.isAvailable = false;
+    listing.bookedBy = req.user.id; // Track the booking customer
+
     await listing.save();
 
-    // Return a success response
     res.status(200).json({ success: true, message: 'Listing booked successfully', listing });
   } catch (error) {
     console.error(error);
     next(errorHandler(500, 'Booking failed'));
+  }
+};
+
+
+export const returnListing = async (req, res, next) => {
+  try {
+    const listing = await Listing.findById(req.params.id); // Use req.params.id here
+    if (!listing) return res.status(404).json({ success: false, message: 'Listing not found' });
+
+    // Update listing availability
+    listing.isAvailable = true;
+    await listing.save();
+
+    res.status(200).json({ success: true, message: 'Listing returned successfully', listing });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Failed to return listing' });
+  }
+};
+
+
+export const showUserBookings = async (req, res, next) => {
+  try {
+    // Find all bookings for the logged-in user where `isAvailable` is false
+    const bookings = await Listing.find({ userRef: req.params.userId, isAvailable: false });
+    
+    if (!bookings || bookings.length === 0) {
+      return res.status(404).json({ success: false, message: 'No bookings found for this user' });
+    }
+
+    res.status(200).json({ success: true, bookings });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Failed to retrieve bookings' });
   }
 };

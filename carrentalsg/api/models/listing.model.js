@@ -65,9 +65,15 @@ const listingSchema = new mongoose.Schema(
       type: Array,
       required: true,
     },
+    bookedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', // The user who booked the listing
+      default: null
+    },
     userRef: {
-      type: String,
-      required: true,
+       type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // The owner of the listing
+    required: true
     },
   },
   { timestamps: true }

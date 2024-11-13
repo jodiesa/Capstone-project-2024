@@ -116,7 +116,7 @@ export default function Profile() {
       }
       dispatch(deleteUserSuccess(data));
     } catch (error) {
-      dispatch(deleteUserFailure(data.message));
+      dispatch(deleteUserFailure(error.message));
     }
   };
 
@@ -136,22 +136,18 @@ export default function Profile() {
   };
 
   const handleShowBookings = async () => {
-    console.log("Show Bookings button clicked"); // Check if this logs
     try {
       const res = await fetch(`/api/user/bookings/${currentUser._id}`);
       const data = await res.json();
-      console.log('Bookings data:', data);  // For debugging
-  
       if (data.success === false) {
         console.error(data.message);
         return;
       }
-      setUserBookings(data.bookings); // Set bookings list
+      setUserBookings(data.bookings);
     } catch (error) {
       console.error('Error fetching bookings:', error);
     }
   };
-  
 
   const handleListingDelete = async (listingId) => {
     try {
@@ -289,6 +285,9 @@ export default function Profile() {
                 <p>{booking.name}</p>
               </Link>
               <p className="text-green-700">Booked</p>
+              <Link to={`/return-car/${booking._id}`}>
+                <button className="text-blue-700 uppercase">Return Car</button>
+              </Link>
             </div>
           ))}
         </div>
