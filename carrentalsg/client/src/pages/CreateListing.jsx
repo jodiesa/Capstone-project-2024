@@ -157,53 +157,61 @@ export default function CreateListing() {
       </h1>
       <form onSubmit={handleSubmit} className='flex flex-col sm:flex-row gap-4'>
         <div className='flex flex-col gap-4 flex-1'>
-          <input
-            type='text'
-            placeholder='Name'
-            className='border p-3 rounded-lg'
-            id='name'
-            maxLength='62'
-            minLength='10'
-            required
-            onChange={handleChange}
-            value={formData.name}
-          />
-          <textarea
-            placeholder='Description'
-            className='border p-3 rounded-lg'
-            id='description'
-            required
-            onChange={handleChange}
-            value={formData.description}
-          />
-          <input
-            type='text'
-            placeholder='Location'
-            className='border p-3 rounded-lg'
-            id='location'
-            required
-            onChange={handleChange}
-            value={formData.location}
-          />
-          <input
-            type='text'
-            placeholder='color'
-            className='border p-3 rounded-lg'
-            id='color'
-            required
-            onChange={handleChange}
-            value={formData.color}
-          />
+        <label htmlFor='name' className='font-semibold'>Name:</label>
+      <input
+        type='text'
+        placeholder='Name'
+        className='border p-3 rounded-lg'
+        id='name'
+        maxLength='62'
+        minLength='10'
+        required
+        onChange={handleChange}
+        value={formData.name}
+      />
 
-            <input
-            type='text'
-            placeholder='model'
-            className='border p-3 rounded-lg'
-            id='model'
-            required
-            onChange={handleChange}
-            value={formData.model}
-          />
+      <label htmlFor='description' className='font-semibold'>Description:</label>
+      <textarea
+        placeholder='Description'
+        className='border p-3 rounded-lg'
+        id='description'
+        required
+        onChange={handleChange}
+        value={formData.description}
+      />
+
+      <label htmlFor='location' className='font-semibold'>Location:</label>
+      <input
+        type='text'
+        placeholder='Location'
+        className='border p-3 rounded-lg'
+        id='location'
+        required
+        onChange={handleChange}
+        value={formData.location}
+      />
+
+      <label htmlFor='color' className='font-semibold'>Color:</label>
+      <input
+        type='text'
+        placeholder='Color'
+        className='border p-3 rounded-lg'
+        id='color'
+        required
+        onChange={handleChange}
+        value={formData.color}
+      />
+
+      <label htmlFor='model' className='font-semibold'>Model:</label>
+      <input
+        type='text'
+        placeholder='Model'
+        className='border p-3 rounded-lg'
+        id='model'
+        required
+        onChange={handleChange}
+        value={formData.model}
+      />
           <div className='flex gap-6 flex-wrap'>
             <div className='flex gap-2'>
               <input
