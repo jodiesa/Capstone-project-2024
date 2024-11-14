@@ -87,7 +87,7 @@ export const getListings = async (req, res, next) => {
     let fuelType = req.query.fuelType;
 
     if (fuelType === undefined || fuelType === 'all') {
-      fuelType = { $in: ['petrol', 'electronic'] };
+      fuelType = { $in: ['petrol', 'electric'] };
     }
 
     let type = req.query.type;

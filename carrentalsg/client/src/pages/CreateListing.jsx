@@ -262,12 +262,12 @@ export default function CreateListing() {
   <input
     type='checkbox'
     id='fuelType'
-    value='electronic'
+    value='electric'
     className='w-5'
     onChange={handleChange}
-    checked={formData.fuelType === 'electronic'}
+    checked={formData.fuelType === 'electric'}
   />
-  <span>Electronic</span>
+  <span>electric</span>
 </div>
 
           </div>
