@@ -10,7 +10,7 @@ const listingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    address: {
+    location: {
       type: String,
       required: true,
     },
@@ -22,27 +22,42 @@ const listingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    bathrooms: {
-      type: Number,
-      required: true,
-    },
-    bedrooms: {
-      type: Number,
-      required: true,
-    },
-    furnished: {
-      type: Boolean,
-      required: true,
-    },
-    parking: {
-      type: Boolean,
-      required: true,
-    },
-    type: {
+    model: {
       type: String,
       required: true,
     },
-    offer: {
+    color: {
+      type: String,
+      required: true,
+    },
+   type:{
+    type: String,
+    required : true,
+   },
+   offer: {
+    type: Boolean,
+    required: true,
+   },
+    driveToMalaysia: {
+      type: Boolean,
+      required: true,
+    },
+    fuelType:
+  {
+    type: String,
+    required:true,
+  },
+
+  minAge:{
+    type:Number,
+    required:true,
+  },
+    pax: {
+      type: Number,
+      required: true,
+    },
+
+    isAvailable: {
       type: Boolean,
       required: true,
     },
@@ -50,9 +65,15 @@ const listingSchema = new mongoose.Schema(
       type: Array,
       required: true,
     },
+    bookedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', // The user who booked the listing
+      default: null
+    },
     userRef: {
-      type: String,
-      required: true,
+       type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // The owner of the listing
+    required: true
     },
   },
   { timestamps: true }

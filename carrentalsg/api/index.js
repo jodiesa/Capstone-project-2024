@@ -37,10 +37,14 @@ app.listen(3000, () => {
   console.log('Server is running on port 3000!');
 });
 
+
+
+
 // Route setup
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/listing', listingRouter);
+
 
 // Serve static files from the client build directory
 app.use(express.static(path.join(__dirname, '/client/dist')));

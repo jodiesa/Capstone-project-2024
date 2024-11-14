@@ -78,3 +78,20 @@ export const getUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getUserBookings = async (req, res, next) => {
+  try {
+    const bookings = await Listing.find({
+      bookedBy: req.user.id, // Fetch bookings for the current user
+      isAvailable: false
+    });
+
+    if (!bookings || bookings.length === 0) {
+      return next(errorHandler(404, 'No bookings found for this user!'));
+    }
+
+    res.status(200).json({ success: true, bookings });
+  } catch (error) {
+    next(error);
+  }
+};

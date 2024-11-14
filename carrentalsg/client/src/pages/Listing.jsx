@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore from 'swiper';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore from 'swiper';
 import 'swiper/css/bundle';
 import {
   FaBath,
@@ -13,10 +13,13 @@ import {
   FaMapMarkerAlt,
   FaParking,
   FaShare,
+  FaBicycle,
+  FaCarAlt,
+  FaCalendarCheck,
+  FaRegThumbsUp,
+  FaUser 
 } from 'react-icons/fa';
 import Contact from '../components/Contact';
-
-// https://sabe.io/blog/javascript-format-numbers-commas#:~:text=The%20best%20way%20to%20format,format%20the%20number%20with%20commas.
 
 export default function Listing() {
   SwiperCore.use([Navigation]);
@@ -25,7 +28,9 @@ export default function Listing() {
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
   const [contact, setContact] = useState(false);
+  const [isBooked, setIsBooked] = useState(false);
   const params = useParams();
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -40,6 +45,7 @@ export default function Listing() {
           return;
         }
         setListing(data);
+        setIsBooked(!data.isAvailable); // Reflect the latest availability status
         setLoading(false);
         setError(false);
       } catch (error) {
@@ -47,17 +53,47 @@ export default function Listing() {
         setLoading(false);
       }
     };
+  
+    // Fetch listing when component mounts or when params.listingId changes
     fetchListing();
   }, [params.listingId]);
+  
+
+  const handleBooking = async () => {
+    try {
+      const res = await fetch(`/api/listing/book/${params.listingId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setIsBooked(true); // Mark listing as booked in the frontend
+        setListing((prev) => ({ ...prev, isAvailable: false }));
+        navigate('/'); // Redirect to homepage
+      } else {
+        setError(data.message);
+      }
+    } catch (error) {
+      setError('Booking failed. Please try again.');
+    }
+  };
+
+  const isListingOwner = currentUser && listing && listing.userRef === currentUser._id;
 
   return (
     <main>
       {loading && <p className='text-center my-7 text-2xl'>Loading...</p>}
-      {error && (
-        <p className='text-center my-7 text-2xl'>Something went wrong!</p>
-      )}
-      {listing && !loading && !error && (
+      {error && <p className='text-center my-7 text-2xl'>Something went wrong!</p>}
+      {listing && (
         <div>
+          {isBooked && (
+            <div className="bg-red-800 text-white text-center p-2 uppercase font-semibold">
+              This listing is booked and no longer available for booking.
+            </div>
+          )}
           <Swiper navigation>
             {listing.imageUrls.map((url) => (
               <SwiperSlide key={url}>
@@ -98,7 +134,7 @@ export default function Listing() {
             </p>
             <p className='flex items-center mt-6 gap-2 text-slate-600  text-sm'>
               <FaMapMarkerAlt className='text-green-700' />
-              {listing.address}
+              {listing.location}
             </p>
             <div className='flex gap-4'>
               <p className='bg-red-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
@@ -114,26 +150,33 @@ export default function Listing() {
               <span className='font-semibold text-black'>Description - </span>
               {listing.description}
             </p>
+            <p className='text-slate-800'>
+              <span className='font-semibold text-black'>Model - </span>
+              {listing.model}
+            </p>
             <ul className='text-green-900 font-semibold text-sm flex flex-wrap items-center gap-4 sm:gap-6'>
               <li className='flex items-center gap-1 whitespace-nowrap '>
                 <FaBed className='text-lg' />
-                {listing.bedrooms > 1
-                  ? `${listing.bedrooms} beds `
-                  : `${listing.bedrooms} bed `}
+                {listing.minAge} min Age
               </li>
               <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaBath className='text-lg' />
-                {listing.bathrooms > 1
-                  ? `${listing.bathrooms} baths `
-                  : `${listing.bathrooms} bath `}
+                <FaUser className='text-lg' />
+                {listing.pax} People Maximum
               </li>
+              {listing.fuelType === 'electronic' ? (
+                <li className='flex items-center gap-1 whitespace-nowrap '>
+                  <FaBicycle className='text-lg' />
+                  Electronic
+                </li>
+              ) : (
+                <li className='flex items-center gap-1 whitespace-nowrap '>
+                  <FaShare className='text-lg' />
+                  Petrol
+                </li>
+              )}
               <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaParking className='text-lg' />
-                {listing.parking ? 'Parking spot' : 'No Parking'}
-              </li>
-              <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaChair className='text-lg' />
-                {listing.furnished ? 'Furnished' : 'Unfurnished'}
+                <FaCarAlt className='text-lg' />
+                {listing.driveToMalaysia ? 'Drive to Malaysia Allowed' : 'Not allowed in Malaysia'}
               </li>
             </ul>
             {currentUser && listing.userRef !== currentUser._id && !contact && (
@@ -146,6 +189,18 @@ export default function Listing() {
             )}
             {contact && <Contact listing={listing} />}
           </div>
+
+          {/* Book Button */}
+          {!isBooked && (
+            <button
+              onClick={handleBooking}
+              className={`bg-blue-500 text-white rounded-lg px-4 py-2 mt-4 ${isListingOwner ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={isListingOwner}
+              title={isListingOwner ? 'You cannot book your own listing' : 'Book this listing'}
+            >
+              Book
+            </button>
+          )}
         </div>
       )}
     </main>

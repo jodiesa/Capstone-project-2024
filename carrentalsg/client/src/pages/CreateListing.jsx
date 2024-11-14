@@ -12,15 +12,19 @@ export default function CreateListing() {
     imageUrls: [],
     name: '',
     description: '',
-    address: '',
+    location: '',
+    color: '',
     type: 'rent',
-    bedrooms: 1,
-    bathrooms: 1,
-    regularPrice: 50,
-    discountPrice: 0,
     offer: false,
-    parking: false,
-    furnished: false,
+    regularPrice: 500,
+    discountPrice: 0,
+    model: '',
+    fuelType:'petrol',
+    driveToMalaysia: true,
+    pax: 5,
+    minAge:20,
+    isAvailable:true
+    
   });
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -80,31 +84,44 @@ export default function CreateListing() {
       imageUrls: prev.imageUrls.filter((_, i) => i !== index),
     }));
   };
-
   const handleChange = (e) => {
     const { id, value, checked, type } = e.target;
-
+  
     if (id === 'sale' || id === 'rent') {
       setFormData((prev) => ({ ...prev, type: id }));
-    } else if (['parking', 'furnished', 'offer'].includes(id)) {
+    } else if ([ 'offer', 'driveToMalaysia'].includes(id)) {
       setFormData((prev) => ({ ...prev, [id]: checked }));
+    } else if (id === 'fuelType') {
+      // Handle fuelType as a check button value
+      setFormData((prev) => ({ ...prev, fuelType: value }));
     } else if (['number', 'text', 'textarea'].includes(type)) {
       setFormData((prev) => ({ ...prev, [id]: value }));
     }
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Check if discount price is valid
     if (+formData.regularPrice < +formData.discountPrice) {
       setError('Discount price must be lower than regular price');
       return;
     }
-
+  
     setLoading(true);
     setError(false);
-
+  
     try {
+      // If there are files, upload them first
+      let imageUrls = formData.imageUrls;
+      if (files.length > 0) {
+        const promises = files.map((file) => storeImage(file));
+        const urls = await Promise.all(promises);
+        imageUrls = imageUrls.concat(urls);
+      }
+  
+      // Submit the form data with updated imageUrls
       const res = await fetch('/api/listing/create', {
         method: 'POST',
         headers: {
@@ -112,22 +129,27 @@ export default function CreateListing() {
         },
         body: JSON.stringify({
           ...formData,
+          imageUrls,
           userRef: currentUser._id,
         }),
       });
-
+  
       const data = await res.json();
-      setLoading(false);
       if (data.success === false) {
         setError(data.message);
+      } else {
+        // Navigate after a successful response
+        navigate(`/listing/${data._id}`);
       }
-      navigate(`/listing/${data._id}`);
     } catch (error) {
-      setError(error.message);
+      setError("Submission failed. Please try again.");
+      console.error(error);
+    } finally {
       setLoading(false);
     }
   };
-
+  
+  
   return (
     <main className='p-3 max-w-4xl mx-auto'>
       <h1 className='text-3xl font-semibold text-center my-7'>
@@ -135,34 +157,61 @@ export default function CreateListing() {
       </h1>
       <form onSubmit={handleSubmit} className='flex flex-col sm:flex-row gap-4'>
         <div className='flex flex-col gap-4 flex-1'>
-          <input
-            type='text'
-            placeholder='Name'
-            className='border p-3 rounded-lg'
-            id='name'
-            maxLength='62'
-            minLength='10'
-            required
-            onChange={handleChange}
-            value={formData.name}
-          />
-          <textarea
-            placeholder='Description'
-            className='border p-3 rounded-lg'
-            id='description'
-            required
-            onChange={handleChange}
-            value={formData.description}
-          />
-          <input
-            type='text'
-            placeholder='Address'
-            className='border p-3 rounded-lg'
-            id='address'
-            required
-            onChange={handleChange}
-            value={formData.address}
-          />
+        <label htmlFor='name' className='font-semibold'>Name:</label>
+      <input
+        type='text'
+        placeholder='Name'
+        className='border p-3 rounded-lg'
+        id='name'
+        maxLength='62'
+        minLength='10'
+        required
+        onChange={handleChange}
+        value={formData.name}
+      />
+
+      <label htmlFor='description' className='font-semibold'>Description:</label>
+      <textarea
+        placeholder='Description'
+        className='border p-3 rounded-lg'
+        id='description'
+        required
+        onChange={handleChange}
+        value={formData.description}
+      />
+
+      <label htmlFor='location' className='font-semibold'>Location:</label>
+      <input
+        type='text'
+        placeholder='Location'
+        className='border p-3 rounded-lg'
+        id='location'
+        required
+        onChange={handleChange}
+        value={formData.location}
+      />
+
+      <label htmlFor='color' className='font-semibold'>Color:</label>
+      <input
+        type='text'
+        placeholder='Color'
+        className='border p-3 rounded-lg'
+        id='color'
+        required
+        onChange={handleChange}
+        value={formData.color}
+      />
+
+      <label htmlFor='model' className='font-semibold'>Model:</label>
+      <input
+        type='text'
+        placeholder='Model'
+        className='border p-3 rounded-lg'
+        id='model'
+        required
+        onChange={handleChange}
+        value={formData.model}
+      />
           <div className='flex gap-6 flex-wrap'>
             <div className='flex gap-2'>
               <input
@@ -187,60 +236,75 @@ export default function CreateListing() {
             <div className='flex gap-2'>
               <input
                 type='checkbox'
-                id='parking'
-                className='w-5'
-                onChange={handleChange}
-                checked={formData.parking}
-              />
-              <span>Parking spot</span>
-            </div>
-            <div className='flex gap-2'>
-              <input
-                type='checkbox'
-                id='furnished'
-                className='w-5'
-                onChange={handleChange}
-                checked={formData.furnished}
-              />
-              <span>Furnished</span>
-            </div>
-            <div className='flex gap-2'>
-              <input
-                type='checkbox'
                 id='offer'
                 className='w-5'
                 onChange={handleChange}
                 checked={formData.offer}
               />
+             
               <span>Offer</span>
             </div>
+            <div className='flex gap-2'>
+              <input
+                type='checkbox'
+                id='driveToMalaysia'
+                className='w-5'
+                onChange={handleChange}
+                checked={formData.driveToMalaysia}
+              />
+             
+              <span>Drive To Malaysia</span>
+            </div>
+            <div className='flex gap-2'>
+  <input
+    type='checkbox'
+    id='fuelType'
+    value='petrol'
+    className='w-5'
+    onChange={handleChange}
+    checked={formData.fuelType === 'petrol'}
+  />
+  <span>Petrol</span>
+</div>
+<div className='flex gap-2'>
+  <input
+    type='checkbox'
+    id='fuelType'
+    value='electric'
+    className='w-5'
+    onChange={handleChange}
+    checked={formData.fuelType === 'electric'}
+  />
+  <span>electric</span>
+</div>
+
           </div>
           <div className='flex flex-wrap gap-6'>
             <div className='flex items-center gap-2'>
               <input
                 type='number'
-                id='bedrooms'
-                min='1'
-                max='10'
+                id='minAge'
+                min='18'
+                max='100'
                 required
                 className='p-3 border border-gray-300 rounded-lg'
                 onChange={handleChange}
-                value={formData.bedrooms}
+                value={formData.minAge}
               />
-              <p>Beds</p>
+              <p>Minimum Age</p>
             </div>
             <div className='flex items-center gap-2'>
               <input
                 type='number'
-                id='bathrooms'
+                id='pax'
                 min='1'
                 max='10'
                 required
                 className='p-3 border border-gray-300 rounded-lg'
                 onChange={handleChange}
-                value={formData.bathrooms}
+                value={formData.pax}
               />
-              <p>Baths</p>
+              <p>Pax</p>
             </div>
             <div className='flex items-center gap-2'>
               <input
