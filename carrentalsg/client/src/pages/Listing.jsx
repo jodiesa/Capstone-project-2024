@@ -17,6 +17,7 @@ import {
   FaCarAlt,
   FaCalendarCheck,
   FaRegThumbsUp,
+  FaGasPump,
   FaUser 
 } from 'react-icons/fa';
 import Contact from '../components/Contact';
@@ -166,11 +167,11 @@ export default function Listing() {
               {listing.fuelType === 'electronic' ? (
                 <li className='flex items-center gap-1 whitespace-nowrap '>
                   <FaBicycle className='text-lg' />
-                  Electronic
+                  Electric
                 </li>
               ) : (
                 <li className='flex items-center gap-1 whitespace-nowrap '>
-                  <FaShare className='text-lg' />
+                  <FaGasPump className='text-lg' />
                   Petrol
                 </li>
               )}
@@ -184,23 +185,26 @@ export default function Listing() {
                 onClick={() => setContact(true)}
                 className='bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3'
               >
-                Contact landlord
+                Enquire about this car
               </button>
             )}
             {contact && <Contact listing={listing} />}
+                    {/* Book Button */}
+{!isBooked && (
+  <button
+    onClick={handleBooking}
+    className={`bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3 ${
+      isListingOwner ? 'opacity-50 cursor-not-allowed' : ''
+    }`}
+    disabled={isListingOwner}
+    title={isListingOwner ? 'You cannot book your own listing' : 'Book this listing'}
+  >
+    Book
+  </button>
+)}
           </div>
 
-          {/* Book Button */}
-          {!isBooked && (
-            <button
-              onClick={handleBooking}
-              className={`bg-blue-500 text-white rounded-lg px-4 py-2 mt-4 ${isListingOwner ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={isListingOwner}
-              title={isListingOwner ? 'You cannot book your own listing' : 'Book this listing'}
-            >
-              Book
-            </button>
-          )}
+
         </div>
       )}
     </main>
