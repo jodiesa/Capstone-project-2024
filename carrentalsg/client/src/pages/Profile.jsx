@@ -30,6 +30,10 @@ export default function Profile() {
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
   const [userBookings, setUserBookings] = useState([]);
+  const [users, setUsers] = useState([]); // State to store users
+  const [loadingUsers, setLoadingUsers] = useState(false); // State for loading users
+  const [showUsersError, setShowUsersError] = useState(false);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -165,6 +169,36 @@ export default function Profile() {
     }
   };
 
+
+  const handleShowUsers = async () => {
+    setLoadingUsers(true);
+    setShowUsersError(false);
+    try {
+      const res = await fetch('/api/user/all', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch users');
+      }
+
+      const data = await res.json();
+      if (data.success) {
+        setUsers(data.users); // Set the fetched users in the state
+      } else {
+        setShowUsersError(true);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error.message);
+      setShowUsersError(true);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -290,6 +324,42 @@ export default function Profile() {
               </Link>
             </div>
           ))}
+        </div>
+      )}
+
+
+
+       {/* Button to fetch and display users */}
+       <button
+        onClick={handleShowUsers}
+        className="bg-blue-500 text-white rounded-lg p-3 uppercase hover:opacity-95 mt-5 w-full"
+      >
+        Show Users
+      </button>
+
+      {loadingUsers && <p className="text-center text-blue-700 mt-5">Loading...</p>}
+      {showUsersError && <p className="text-center text-red-700 mt-5">Failed to load users.</p>}
+
+      {/* Table to display users */}
+      {users.length > 0 && (
+        <div className="mt-5">
+          <h1 className="text-center text-2xl font-semibold">All Users</h1>
+          <table className="table-auto w-full border-collapse border border-gray-300 mt-3">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="border border-gray-300 p-2">Username</th>
+                <th className="border border-gray-300 p-2">Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user._id} className="text-center">
+                  <td className="border border-gray-300 p-2">{user.username}</td>
+                  <td className="border border-gray-300 p-2">{user.email}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
