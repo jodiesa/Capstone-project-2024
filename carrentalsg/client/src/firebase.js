@@ -5,16 +5,13 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  apiKey: "AIzaSyBUGX-h9tW07LPdXOojaVcWCbJjkkhKe8Y",
   authDomain: "car-rental-sg.firebaseapp.com",
   projectId: "car-rental-sg",
-  storageBucket: "car-rental-sg.appspot.com",
+  storageBucket: "car-rental-sg.firebasestorage.app",
   messagingSenderId: "324432774105",
   appId: "1:324432774105:web:6ebb45e64f0fd0924a0fc8"
 };
-
-
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
