@@ -97,13 +97,12 @@ export const getUserBookings = async (req, res, next) => {
 };
 
 
+
 export const getAllUsers = async (req, res, next) => {
   try {
-    // Fetch all users, excluding sensitive fields like `password`
-    const users = await User.find({}, '-password');
+    const users = await User.find({}, 'username email'); // Adjust fields as needed
     res.status(200).json({ success: true, users });
   } catch (error) {
-    console.error('Error fetching users:', error.message);
-    res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
+    next(errorHandler(500, 'Failed to retrieve users!'));
   }
 };

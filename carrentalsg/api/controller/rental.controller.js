@@ -83,17 +83,19 @@ export const returnListing = async (req, res, next) => {
 
 // Get user bookings
 export const getUserBookings = async (req, res, next) => {
-  try {
-    const rentals = await Rental.find({ user: req.user.id })
-      .populate('listing', 'name isAvailable')
-      .exec();
-
-    if (!rentals.length) {
-      return next(errorHandler(404, 'No rentals found for this user!'));
+    try {
+      const rentals = await Rental.find({ user: req.user.id })
+        .populate('listing', 'name imageUrls isAvailable')
+        .populate('user', 'username email') // Populate user details
+        .exec();
+  
+      if (!rentals.length) {
+        return next(errorHandler(404, 'No rentals found for this user!'));
+      }
+  
+      res.status(200).json({ success: true, rentals });
+    } catch (error) {
+      next(errorHandler(500, 'Failed to retrieve rentals!'));
     }
-
-    res.status(200).json({ success: true, rentals });
-  } catch (error) {
-    next(errorHandler(500, 'Failed to retrieve rentals!'));
-  }
-};
+  };
+  

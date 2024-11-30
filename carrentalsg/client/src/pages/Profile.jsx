@@ -30,6 +30,11 @@ export default function Profile() {
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
   const dispatch = useDispatch();
+  const [userBookings, setUserBookings] = useState([]);
+  const [showBookingsError, setShowBookingsError] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+  const [showUsersError, setShowUsersError] = useState(false);
+  
 
   // firebase storage
   // allow read;
@@ -142,6 +147,49 @@ export default function Profile() {
       setShowListingsError(true);
     }
   };
+
+  const handleShowBookings = async () => {
+    try {
+      setShowBookingsError(false);
+      const res = await fetch(`/api/rental/user`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${currentUser.token}`, // Include token if authentication is required
+        },
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setShowBookingsError(true);
+        return;
+      }
+      setUserBookings(data.rentals);
+    } catch (error) {
+      setShowBookingsError(true);
+    }
+  };
+  
+  const handleShowUsers = async () => {
+    try {
+      setShowUsersError(false);
+      const res = await fetch(`/api/user/all`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${currentUser.token}`, // Include token if authentication is required
+        },
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setShowUsersError(true);
+        return;
+      }
+      setAllUsers(data.users);
+    } catch (error) {
+      setShowUsersError(true);
+    }
+  };
+  
 
   const handleListingDelete = async (listingId) => {
     try {
@@ -289,6 +337,80 @@ export default function Profile() {
           ))}
         </div>
       )}
+
+<button onClick={handleShowBookings} className="text-green-700 w-full">
+  Show Bookings
+</button>
+<p className="text-red-700 mt-5">
+  {showBookingsError ? 'Error showing bookings' : ''}
+</p>
+
+
+{userBookings && userBookings.length > 0 && (
+  <div className="flex flex-col gap-4">
+    <h1 className="text-center mt-7 text-2xl font-semibold">Your Bookings</h1>
+    {userBookings.map((booking) => (
+      <div
+        key={booking._id}
+        className="border rounded-lg p-3 flex justify-between items-center gap-4"
+      >
+        <Link to={`/listing/${booking.listing._id}`}>
+          <img
+            src={booking.listing.imageUrls[0]} // Replace with the correct field
+            alt="booking cover"
+            className="h-16 w-16 object-contain"
+          />
+        </Link>
+        <div className="flex-1">
+          <p className="text-slate-700 font-semibold truncate">
+            <Link to={`/listing/${booking.listing._id}`}>
+              {booking.listing.name}
+            </Link>
+          </p>
+          <p className="text-slate-500 text-sm">
+            Booked by: {booking.user.username} ({booking.user.email})
+          </p>
+          <p className="text-slate-500 text-sm">Status: {booking.status}</p>
+        </div>
+        <div className="flex flex-col item-center">
+          {booking.status === 'booked' && (
+            <button
+              onClick={() => handleReturnListing(booking.listing._id)}
+              className="text-red-700 uppercase"
+            >
+              Return
+            </button>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+<button onClick={handleShowUsers} className="text-blue-700 w-full">
+  Show All Users
+</button>
+<p className="text-red-700 mt-5">
+  {showUsersError ? 'Error showing users' : ''}
+</p>
+
+{allUsers && allUsers.length > 0 && (
+  <div className="flex flex-col gap-4">
+    <h1 className="text-center mt-7 text-2xl font-semibold">All Users</h1>
+    {allUsers.map((user) => (
+      <div
+        key={user._id}
+        className="border rounded-lg p-3 flex justify-between items-center gap-4"
+      >
+        <p className="text-slate-700 font-semibold truncate">
+          {user.username} ({user.email})
+        </p>
+      </div>
+    ))}
+  </div>
+)}
+
+      
     </div>
   );
 }
