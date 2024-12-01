@@ -57,29 +57,42 @@ export const bookListing = async (req, res, next) => {
 
 // Return a listing
 export const returnListing = async (req, res, next) => {
-  const { listingId } = req.params;
-  try {
-    const rental = await findActiveRental(req.user.id, listingId, next);
-    const listing = await findListingById(listingId, next);
-
-    // Update listing availability
-    listing.isAvailable = true;
-
-    // Update rental details
-    rental.status = 'returned';
-    rental.returnedAt = new Date();
-
-    await Promise.all([listing.save(), rental.save()]);
-
-    res.status(200).json({
-      success: true,
-      message: 'Listing returned successfully!',
-      rental,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+    const { listingId } = req.params;
+    try {
+      // Retrieve the active rental
+      const rental = await findActiveRental(req.user.id, listingId, next);
+      if (!rental) {
+        return res.status(404).json({ success: false, message: 'Active rental not found!' });
+      }
+  
+      // Retrieve the listing
+      const listing = await findListingById(listingId, next);
+      if (!listing) {
+        return res.status(404).json({ success: false, message: 'Listing not found!' });
+      }
+  
+      // Update listing availability
+      listing.isAvailable = true;
+  
+      // Update rental details
+      rental.status = 'returned';
+      rental.returnedAt = new Date();
+  
+      // Save both changes in a single transaction
+      await Promise.all([listing.save(), rental.save()]);
+  
+      res.status(200).json({
+        success: true,
+        message: 'Car successfully returned!',
+        rental,
+        listing,
+      });
+    } catch (error) {
+      console.error('Error in returnListing:', error);
+      next(errorHandler(500, 'Failed to process the return request!'));
+    }
+  };
+  
 
 // Get user bookings
 export const getUserBookings = async (req, res, next) => {

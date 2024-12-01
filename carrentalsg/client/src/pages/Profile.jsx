@@ -17,7 +17,7 @@ import {
   signOutUserStart,
 } from '../../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -34,7 +34,8 @@ export default function Profile() {
   const [showBookingsError, setShowBookingsError] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [showUsersError, setShowUsersError] = useState(false);
-  
+  const navigate = useNavigate();
+
 
   // firebase storage
   // allow read;
@@ -172,11 +173,11 @@ export default function Profile() {
   const handleShowUsers = async () => {
     try {
       setShowUsersError(false);
-      const res = await fetch(`/api/user/all`, {
+      const res = await fetch('/api/user/all-with-bookings', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`, // Include token if authentication is required
+          Authorization: `Bearer ${currentUser.token}`, // Ensure token is passed if required
         },
       });
       const data = await res.json();
@@ -186,9 +187,11 @@ export default function Profile() {
       }
       setAllUsers(data.users);
     } catch (error) {
+      console.error('Error fetching all users with bookings:', error);
       setShowUsersError(true);
     }
   };
+  
   
 
   const handleListingDelete = async (listingId) => {
@@ -374,12 +377,13 @@ export default function Profile() {
         </div>
         <div className="flex flex-col item-center">
           {booking.status === 'booked' && (
-            <button
-              onClick={() => handleReturnListing(booking.listing._id)}
-              className="text-red-700 uppercase"
-            >
-              Return
-            </button>
+      <button
+      onClick={() => navigate(`/return-car/${booking.listing._id}`)}
+      className="text-red-700 uppercase"
+    >
+      Return
+    </button>
+    
           )}
         </div>
       </div>
@@ -405,6 +409,66 @@ export default function Profile() {
         <p className="text-slate-700 font-semibold truncate">
           {user.username} ({user.email})
         </p>
+      </div>
+    ))}
+  </div>
+)}
+
+<button onClick={handleShowUsers} className="text-blue-700 w-full">
+  Show All Users with Bookings
+</button>
+<p className="text-red-700 mt-5">
+  {showUsersError ? 'Error showing users' : ''}
+</p>
+
+
+{allUsers && allUsers.length > 0 && (
+  <div className="flex flex-col gap-4">
+    <h1 className="text-center mt-7 text-2xl font-semibold">All Users</h1>
+    {allUsers.map((user) => (
+      <div
+        key={user._id}
+        className="border rounded-lg p-3 flex flex-col gap-4"
+      >
+        <div className="flex justify-between items-center">
+          <div className="flex-1">
+            <p className="text-slate-700 font-semibold truncate">
+              Username: {user.username}
+            </p>
+            <p className="text-slate-500 text-sm">Email: {user.email}</p>
+          </div>
+        </div>
+        {user.bookings && user.bookings.length > 0 ? (
+          <div className="flex flex-col gap-2">
+            <h2 className="text-lg font-semibold">Bookings:</h2>
+            {user.bookings.map((booking) => (
+              <div
+                key={booking._id}
+                className="border rounded-lg p-2 flex items-center gap-4"
+              >
+                <Link to={`/listing/${booking.listing._id}`}>
+                  <img
+                    src={booking.listing.imageUrls[0]} // Replace with the correct field
+                    alt="booking cover"
+                    className="h-16 w-16 object-contain"
+                  />
+                </Link>
+                <div className="flex-1">
+                  <p className="text-slate-700 font-semibold truncate">
+                    <Link to={`/listing/${booking.listing._id}`}>
+                      {booking.listing.name}
+                    </Link>
+                  </p>
+                  <p className="text-slate-500 text-sm">
+                    Status: {booking.status}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-slate-500 text-sm">No bookings found.</p>
+        )}
       </div>
     ))}
   </div>

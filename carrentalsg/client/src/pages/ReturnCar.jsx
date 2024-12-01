@@ -113,31 +113,28 @@ export default function ReturnCar() {
     setError(false);
   
     try {
-      const updatedFormData = { ...formData, isAvailable: true };
-      const updatedImageUrls = files.length > 0
-        ? await Promise.all(files.map(storeImage)).then((urls) => formData.imageUrls.concat(urls))
-        : formData.imageUrls;
-  
-      const res = await fetch(`/api/listing/return-car/${params.listingId}`, {
+      const res = await fetch(`/api/rental/${params.listingId}/return`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...updatedFormData,
-          imageUrls: updatedImageUrls,
-          userRef: currentUser._id,
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${currentUser.token}`, // Include token if required
+        },
       });
   
       const data = await res.json();
       setLoading(false);
-      if (data.success === false) {
+  
+      if (!data.success) {
         setError(data.message);
-      } else {
-        localStorage.setItem('returnSuccess', 'Car returned successfully!');
-        navigate(`/listing/${params.listingId}`);
+        return;
       }
+  
+      // Show success message and redirect
+      localStorage.setItem('returnSuccess', 'Car returned successfully!');
+      navigate(`/listing/${params.listingId}`); // Redirect to the listing page
     } catch (error) {
-      setError('Submission failed. Please try again.');
+      console.error('Error during return:', error);
+      setError('Failed to return the car. Please try again.');
       setLoading(false);
     }
   };
