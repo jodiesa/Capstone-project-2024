@@ -59,21 +59,23 @@ export default function Listing() {
     fetchListing();
   }, [params.listingId]);
   
-
   const handleBooking = async () => {
     try {
-      const res = await fetch(`/api/listing/book/${params.listingId}`, {
+      const res = await fetch(`/api/rental/book/${params.listingId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${currentUser.token}`, // Ensure the token is valid
         },
       });
+      
+  
       const data = await res.json();
-
+  
       if (data.success) {
-        setIsBooked(true); // Mark listing as booked in the frontend
+        setIsBooked(true); // Update booking state
         setListing((prev) => ({ ...prev, isAvailable: false }));
-        navigate('/'); // Redirect to homepage
+        navigate('/'); // Redirect or update UI as needed
       } else {
         setError(data.message);
       }
@@ -81,7 +83,7 @@ export default function Listing() {
       setError('Booking failed. Please try again.');
     }
   };
-
+  
   const isListingOwner = currentUser && listing && listing.userRef === currentUser._id;
 
   return (

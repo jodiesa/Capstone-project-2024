@@ -26,30 +26,36 @@ export default function CreateListing() {
     isAvailable:true
     
   });
+  
+
+
+
+
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   console.log(formData);
-
-  const handleImageSubmit = () => {
-    if (files.length > 0 && files.length + formData.imageUrls.length <= 6) {
+  const handleImageSubmit = (e) => {
+    if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
       setImageUploadError(false);
-      const promises = files.map(file => storeImage(file));
+      const promises = [];
 
+      for (let i = 0; i < files.length; i++) {
+        promises.push(storeImage(files[i]));
+      }
       Promise.all(promises)
         .then((urls) => {
-          setFormData((prev) => ({
-            ...prev,
-            imageUrls: prev.imageUrls.concat(urls),
-          }));
+          setFormData({
+            ...formData,
+            imageUrls: formData.imageUrls.concat(urls),
+          });
           setImageUploadError(false);
+          setUploading(false);
         })
-        .catch(() => {
+        .catch((err) => {
           setImageUploadError('Image upload failed (2 mb max per image)');
-        })
-        .finally(() => {
           setUploading(false);
         });
     } else {
@@ -61,29 +67,39 @@ export default function CreateListing() {
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
-      const fileName = `${Date.now()}-${file.name}`;
+      const fileName = new Date().getTime() + file.name;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, file);
       uploadTask.on(
         'state_changed',
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log(`Upload is ${progress}% done`);
         },
-        (error) => reject(error),
+        (error) => {
+          reject(error);
+        },
         () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(resolve).catch(reject);
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
         }
       );
     });
   };
 
   const handleRemoveImage = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      imageUrls: prev.imageUrls.filter((_, i) => i !== index),
-    }));
+    setFormData({
+      ...formData,
+      imageUrls: formData.imageUrls.filter((_, i) => i !== index),
+    });
   };
+
+
+
+
+
   const handleChange = (e) => {
     const { id, value, checked, type } = e.target;
   
@@ -103,7 +119,7 @@ export default function CreateListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Check if discount price is valid
+    // Validate discount price
     if (+formData.regularPrice < +formData.discountPrice) {
       setError('Discount price must be lower than regular price');
       return;
@@ -113,15 +129,16 @@ export default function CreateListing() {
     setError(false);
   
     try {
-      // If there are files, upload them first
       let imageUrls = formData.imageUrls;
+  
+      // Upload files if any
       if (files.length > 0) {
         const promises = files.map((file) => storeImage(file));
         const urls = await Promise.all(promises);
         imageUrls = imageUrls.concat(urls);
       }
   
-      // Submit the form data with updated imageUrls
+      // Submit form data
       const res = await fetch('/api/listing/create', {
         method: 'POST',
         headers: {
@@ -138,7 +155,6 @@ export default function CreateListing() {
       if (data.success === false) {
         setError(data.message);
       } else {
-        // Navigate after a successful response
         navigate(`/listing/${data._id}`);
       }
     } catch (error) {
@@ -148,6 +164,7 @@ export default function CreateListing() {
       setLoading(false);
     }
   };
+  
   
   
   return (
@@ -354,14 +371,15 @@ export default function CreateListing() {
             </span>
           </p>
           <div className='flex gap-4'>
-            <input
-              onChange={(e) => setFiles(e.target.files)}
-              className='p-3 border border-gray-300 rounded w-full'
-              type='file'
-              id='images'
-              accept='image/*'
-              multiple
-            />
+          <input
+  onChange={(e) => setFiles(Array.from(e.target.files))} // Convert FileList to an array
+  className="p-3 border border-gray-300 rounded w-full"
+  type="file"
+  id="images"
+  accept="image/*"
+  multiple
+/>
+
             <button
               type='button'
               disabled={uploading}
