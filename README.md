@@ -20,3 +20,5 @@
 2. Install dependencies using `npm install`.
 3. Start the development server with `npm start`.
 
+### Use of UiPath
+1. The use of UiPath for the admin modules 
