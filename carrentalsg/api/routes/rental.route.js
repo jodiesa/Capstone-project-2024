@@ -2,7 +2,7 @@ import express from 'express';
 import {
   getUserBookings,bookListing,returnListing
 } from '../controller/rental.controller.js';
-import { verifyToken } from '../utils/verifyUser.js';
+import { verifyToken,verifyAdmin} from '../utils/verifyUser.js';
 
 const router = express.Router();
 

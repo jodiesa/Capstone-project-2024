@@ -1,41 +1,20 @@
-version: '3.8'
-
 services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile
-      target: backend
+      dockerfile: api/Dockerfile
     ports:
-      - "3002:3000"
+      - "5000:5000"
     environment:
-      - NODE_ENV=production
-    networks:
-      - app-network
+      - MONGO_URI=${MONGO_URI}   # make sure .env has this
+    env_file:
+      - .env
 
   frontend:
     build:
-      context: .
+      context: ./client
       dockerfile: Dockerfile
-      target: frontend
     ports:
-      - "3001:3000"
-    environment:
-      - REACT_APP_API_URL=http://localhost:3000
-    networks:
-      - app-network
-
-
-  mongo:
-  image: mongo:latest
-  container_name: mongo
-  ports:
-    - "27017:27017"
-  networks:
-    - app-network
-  volumes:
-    - mongo_data:/data/db
-
-
-networks:
-  app-network:
+      - "3001:3001"
+    depends_on:
+      - backend

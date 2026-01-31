@@ -5,16 +5,28 @@ import { errorHandler } from "../utils/error.js";
 import jwt from 'jsonwebtoken';
 
 export const signup = async (req, res, next) => {
-    const { username, email, password } = req.body;
-    const hashedPassword = bcryptjs.hashSync(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword });
-    try {
-      await newUser.save();
-      res.status(201).json('User created successfully!');
-    } catch (error) {
-      next(error);
-    }
-  };
+  const { username, email, password, isAdmin } = req.body;
+
+  // Hash the user's password
+  const hashedPassword = bcryptjs.hashSync(password, 10);
+
+  // Create a new user instance
+  const newUser = new User({
+    username,
+    email,
+    password: hashedPassword,
+    isAdmin: isAdmin || false, // Set admin status, default to false
+  });
+
+  try {
+    // Save the new user to the database
+    await newUser.save();
+    res.status(201).json('User created successfully!');
+  } catch (error) {
+    next(error); // Pass error to your error handler
+  }
+};
+
 
 
 export const signin = async (req, res, next) => {
@@ -24,7 +36,11 @@ export const signin = async (req, res, next) => {
       if (!validUser) return next(errorHandler(404, 'User not found!'));
       const validPassword = bcryptjs.compareSync(password, validUser.password);
       if (!validPassword) return next(errorHandler(401, 'Wrong credentials!'));
-      const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+      const token = jwt.sign(
+        { id: validUser._id, isAdmin: validUser.isAdmin },
+        process.env.JWT_SECRET
+      );
+      
       const { password: pass, ...rest } = validUser._doc;
       res
         .cookie('access_token', token, { httpOnly: true })

@@ -1,18 +1,17 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc';
+import react from '@vitejs/plugin-react-swc'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-
-
-  server:{
-    proxy:{
-      '/api':{
-        target:'http://localhost:3000',
-        secure:false,
-
-      },
-    },
+  server: {
+    host: '0.0.0.0',       // important for Docker
+    port: 3001,
+    proxy: {
+      '/api': {
+        target: 'http://backend:3000',  // matches your backend service name
+        changeOrigin: true,
+        secure: false
+      }
+    }
   },
-  plugins: [react()],
-});
+  plugins: [react()]
+})

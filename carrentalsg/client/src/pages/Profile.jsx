@@ -294,12 +294,11 @@ export default function Profile() {
       <p className='text-green-700 mt-5'>
         {updateSuccess ? 'User is updated successfully!' : ''}
       </p>
-      <button onClick={handleShowListings} className='text-green-700 w-full'>
-        Show Listings
-      </button>
-      <p className='text-red-700 mt-5'>
-        {showListingsError ? 'Error showing listings' : ''}
-      </p>
+      {currentUser?.isAdmin && (
+  <button onClick={handleShowListings} className="text-green-700 w-full">
+    Show Listings
+  </button>
+)}
 
       {userListings && userListings.length > 0 && (
         <div className='flex flex-col gap-4'>
@@ -348,7 +347,6 @@ export default function Profile() {
   {showBookingsError ? 'Error showing bookings' : ''}
 </p>
 
-
 {userBookings && userBookings.length > 0 && (
   <div className="flex flex-col gap-4">
     <h1 className="text-center mt-7 text-2xl font-semibold">Your Bookings</h1>
@@ -374,16 +372,21 @@ export default function Profile() {
             Booked by: {booking.user.username} ({booking.user.email})
           </p>
           <p className="text-slate-500 text-sm">Status: {booking.status}</p>
+          <p className="text-slate-500 text-sm">
+            <strong>Booking Date:</strong> {booking.bookedAt}
+          </p>
+          <p className="text-slate-500 text-sm">
+            <strong>Return Date:</strong> {booking.returnedAt}
+          </p>
         </div>
         <div className="flex flex-col item-center">
-          {booking.status === 'booked' && (
-      <button
-      onClick={() => navigate(`/return-car/${booking.listing._id}`)}
-      className="text-red-700 uppercase"
-    >
-      Return
-    </button>
-    
+          {booking.status === "booked" && (
+            <button
+              onClick={() => navigate(`/return-car/${booking.listing._id}`)}
+              className="text-red-700 uppercase"
+            >
+              Return
+            </button>
           )}
         </div>
       </div>
@@ -391,103 +394,124 @@ export default function Profile() {
   </div>
 )}
 
+{currentUser?.isAdmin && (
+  <>
+    <button onClick={handleShowUsers} className="text-blue-700 w-full">
+      Show All Users with Bookings
+    </button>
+    <p className="text-red-700 mt-5">
+      {showUsersError ? 'Error showing users' : ''}
+    </p>
 
-<button onClick={handleShowUsers} className="text-blue-700 w-full">
-  Show All Users with Bookings
-</button>
-<p className="text-red-700 mt-5">
-  {showUsersError ? 'Error showing users' : ''}
-</p>
+    {allUsers && allUsers.length > 0 && (
+      <div className="flex justify-center items-center">
+        <div className="w-full max-w-5xl flex flex-col gap-6 mt-8 px-8 py-6 rounded-lg ">
+          <h1 className="text-center text-2xl font-semibold text-gray-800">
+            All Users
+          </h1>
+          <table className="w-full border-collapse border border-gray-300 rounded-lg shadow-sm">
+            <thead>
+              <tr>
+                <th className="border border-gray-300 px-6 py-4 text-left text-gray-700">
+                  Username
+                </th>
+                <th className="border border-gray-300 px-6 py-4 text-left text-gray-700">
+                  Email
+                </th>
+                <th className="border border-gray-300 px-6 py-4 text-left text-gray-700">
+                  Bookings
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {allUsers.map((user) => (
+                <tr key={user._id} className="hover:bg-gray-100">
+                  <td className="border border-gray-300 px-6 py-4 text-gray-800">
+                    {user.username}
+                  </td>
+                  <td className="border border-gray-300 px-6 py-4 text-gray-800">
+                    {user.email}
+                  </td>
+                  <td className="border border-gray-300 px-6 py-4 text-gray-800">
+                    <button
+                      className="text-blue-500 hover:underline"
+                      onClick={() =>
+                        setAllUsers((prev) =>
+                          prev.map((u) =>
+                            u._id === user._id
+                              ? { ...u, showBookings: !u.showBookings }
+                              : u
+                          )
+                        )
+                      }
+                    >
+                      Show Bookings ({user.bookings ? user.bookings.length : 0})
+                    </button>
+                    {user.showBookings &&
+                      user.bookings &&
+                      user.bookings.length > 0 && (
+                        <div className="mt-4">
+                          <table className="w-full border-collapse border border-gray-300">
+                            <thead>
+                              <tr>
+                                <th className="border border-gray-300 px-4 py-3 text-left text-gray-700">
+                                  Listing Name
+                                </th>
+                                <th className="border border-gray-300 px-4 py-3 text-left text-gray-700">
+                                  Status
+                                </th>
+                                <th className="border border-gray-300 px-4 py-3 text-left text-gray-700">
+                                  Booked Date
+                                </th>
+                                <th className="border border-gray-300 px-4 py-3 text-left text-gray-700">
+                                  Return Date
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {user.bookings.map((booking) => (
+                                <tr key={booking._id}>
+                                  <td className="border border-gray-300 px-4 py-3 text-gray-800">
+                                    <Link
+                                      to={`/listing/${booking.listing._id}`}
+                                      className="text-blue-500 hover:underline"
+                                    >
+                                      {booking.listing.name}
+                                    </Link>
+                                  </td>
+                                  <td className="border border-gray-300 px-4 py-3 text-gray-800">
+                                    {booking.status}
+                                  </td>
 
-{allUsers && allUsers.length > 0 && (
-  <div className="flex justify-center items-center">
-    <div className="w-full max-w-5xl flex flex-col gap-6 mt-8 px-8 py-6 bg-gray-50 rounded-lg shadow-md">
-      <h1 className="text-center text-2xl font-semibold text-gray-800">
-        All Users
-      </h1>
-      <table className="w-full border-collapse border border-gray-300 bg-white rounded-lg shadow-sm">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-300 px-6 py-4 text-left text-gray-700">
-              Username
-            </th>
-            <th className="border border-gray-300 px-6 py-4 text-left text-gray-700">
-              Email
-            </th>
-            <th className="border border-gray-300 px-6 py-4 text-left text-gray-700">
-              Bookings
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {allUsers.map((user) => (
-            <tr key={user._id} className="hover:bg-gray-100">
-              <td className="border border-gray-300 px-6 py-4 text-gray-800">
-                {user.username}
-              </td>
-              <td className="border border-gray-300 px-6 py-4 text-gray-800">
-                {user.email}
-              </td>
-              <td className="border border-gray-300 px-6 py-4 text-gray-800">
-                <button
-                  className="text-blue-500 hover:underline"
-                  onClick={() =>
-                    setAllUsers((prev) =>
-                      prev.map((u) =>
-                        u._id === user._id
-                          ? { ...u, showBookings: !u.showBookings }
-                          : u
-                      )
-                    )
-                  }
-                >
-                  Show Bookings ({user.bookings ? user.bookings.length : 0})
-                </button>
-                {user.showBookings && user.bookings && user.bookings.length > 0 && (
-                  <div className="mt-4">
-                    <table className="w-full border-collapse border border-gray-300 bg-gray-50 rounded-lg">
-                      <thead>
-                        <tr className="bg-gray-200">
-                          <th className="border border-gray-300 px-4 py-3 text-left text-gray-700">
-                            Listing Name
-                          </th>
-                          <th className="border border-gray-300 px-4 py-3 text-left text-gray-700">
-                            Status
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {user.bookings.map((booking) => (
-                          <tr key={booking._id}>
-                            <td className="border border-gray-300 px-4 py-3 text-gray-800">
-                              <Link
-                                to={`/listing/${booking.listing._id}`}
-                                className="text-blue-500 hover:underline"
-                              >
-                                {booking.listing.name}
-                              </Link>
-                            </td>
-                            <td className="border border-gray-300 px-4 py-3 text-gray-800">
-                              {booking.status}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-                {user.showBookings && (!user.bookings || user.bookings.length === 0) && (
-                  <p className="text-gray-500 mt-4">No bookings available</p>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
+                                  <td className="border border-gray-300 px-4 py-3 text-gray-800">
+                                    {booking.bookedAt}
+                                  </td>
+
+                                  <td className="border border-gray-300 px-4 py-3 text-gray-800">
+                                    {booking.returnedAt}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    {user.showBookings &&
+                      (!user.bookings || user.bookings.length === 0) && (
+                        <p className="text-gray-500 mt-4">
+                          No bookings available
+                        </p>
+                      )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+  </>
 )}
-
 
       
     </div>
