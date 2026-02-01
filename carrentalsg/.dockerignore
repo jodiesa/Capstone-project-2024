@@ -1,4 +1,10 @@
 node_modules
-dist
-*.env
-postman.json
+client/node_modules
+client/dist
+
+.git
+.gitignore
+.env
+.env.test
+README.md
+test

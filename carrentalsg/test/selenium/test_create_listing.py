@@ -5,69 +5,115 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-# Initialize WebDriver (Ensure that ChromeDriver is installed and in PATH)
+# Initialize WebDriver
 driver = webdriver.Chrome()
 
-# Open the React application (Replace 'http://localhost:3000' with your app URL)
-driver.get("http://localhost:3000/create-listing")
+# Open the React application
+driver.get("http://localhost:5173/sign-in")
 
-# Function to wait for an element to be present
 def wait_for_element(locator):
-    return WebDriverWait(driver, 10).until(
+    """Wait for an element to be present in the DOM."""
+    return WebDriverWait(driver, 15).until(
         EC.presence_of_element_located(locator)
     )
 
 try:
-    # Test 1: Verify Required Fields
-    wait_for_element((By.ID, 'name')).send_keys("Test Car")
-    wait_for_element((By.ID, 'description')).send_keys("This is a test description.")
-    wait_for_element((By.ID, 'location')).send_keys("New York")
-    wait_for_element((By.ID, 'color')).send_keys("Red")
-    wait_for_element((By.ID, 'model')).send_keys("Model X")
+    # Step 1: Perform Login
+    print("Logging in...")
+    wait_for_element((By.ID, 'email')).send_keys("jodie90sch@gmail.com")
+    wait_for_element((By.ID, 'password')).send_keys("jodie90sch@gmail.com")
+    wait_for_element((By.XPATH, "//button[text()='Sign In']")).click()
+    print("Login successful!")
+
+    # Step 2: Click Profile
+    print("Clicking Profile...")
+    profile_button = WebDriverWait(driver, 15).until(
+        EC.element_to_be_clickable((By.LINK_TEXT, "Profile"))
+    )
+    profile_button.click()
+    print("Profile clicked!")
+
+    # Step 3: Click Create Listing
+    print("Clicking Create Listing...")
+    create_listing_button = wait_for_element((By.XPATH, "//a[text()='Create Listing']"))
+    create_listing_button.click()
+    print("Create Listing clicked!")
+
+    # Step 4: Fill Out Create Listing Form
+    print("Filling out the Create Listing form...")
     
-    # Check "Drive To Malaysia" checkbox
-    driver.find_element(By.ID, 'driveToMalaysia').click()
+    # Input Name
+    wait_for_element((By.ID, 'name')).send_keys("Test Car")
+    print("Entered Name")
+
+    # Input Description
+    wait_for_element((By.ID, 'description')).send_keys("This is a test description.")
+    print("Entered Description")
+
+    # Input Location
+    wait_for_element((By.ID, 'location')).send_keys("New York")
+    print("Entered Location")
+
+    # Input Color
+    wait_for_element((By.ID, 'color')).send_keys("Red")
+    print("Entered Color")
+
+    # Input Model
+    wait_for_element((By.ID, 'model')).send_keys("Model X")
+    print("Entered Model")
+
+    # Check "Drive To Malaysia" Checkbox
+    drive_to_malaysia = wait_for_element((By.ID, 'driveToMalaysia'))
+    if not drive_to_malaysia.is_selected():
+        drive_to_malaysia.click()
+    print("Checked 'Drive To Malaysia'")
 
     # Select Fuel Type Radio Button
     petrol_radio = driver.find_element(By.CSS_SELECTOR, 'input[id="fuelType"][value="petrol"]')
     if not petrol_radio.is_selected():
         petrol_radio.click()
-    
-    # Set Min Age
-    min_age = driver.find_element(By.ID, 'minAge')
+    print("Selected 'Petrol' Fuel Type")
+
+    # Input Min Age
+    min_age = wait_for_element((By.ID, 'minAge'))
     min_age.clear()
     min_age.send_keys('25')
-    
-    # Set Pax
-    pax = driver.find_element(By.ID, 'pax')
+    print("Entered Minimum Age")
+
+    # Input Pax
+    pax = wait_for_element((By.ID, 'pax'))
     pax.clear()
     pax.send_keys('4')
-    
-    # Set Regular Price
-    regular_price = driver.find_element(By.ID, 'regularPrice')
+    print("Entered Pax")
+
+    # Input Regular Price
+    regular_price = wait_for_element((By.ID, 'regularPrice'))
     regular_price.clear()
     regular_price.send_keys('1000')
+    print("Entered Regular Price")
 
-    # Check the "Offer" checkbox and set Discount Price
-    offer_checkbox = driver.find_element(By.ID, 'offer')
-    offer_checkbox.click()
-    discount_price = driver.find_element(By.ID, 'discountPrice')
+    # Check "Offer" Checkbox and Set Discount Price
+    offer_checkbox = wait_for_element((By.ID, 'offer'))
+    if not offer_checkbox.is_selected():
+        offer_checkbox.click()
+    discount_price = wait_for_element((By.ID, 'discountPrice'))
     discount_price.clear()
     discount_price.send_keys('800')
+    print("Checked 'Offer' and entered Discount Price")
 
-    # Click on Create Listing
-    driver.find_element(By.XPATH, "//button[text()='Create listing']").click()
+    # Click "Create Listing" Button
+    wait_for_element((By.XPATH, "//button[text()='Create listing']")).click()
+    print("Clicked 'Create Listing' button")
 
-    # Wait for navigation to the new listing page or success message
-    WebDriverWait(driver, 10).until(
+    # Step 5: Verify Successful Submission
+    success_message = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, 'h1'))
     )
-
-    print("Form submission test passed successfully!")
+    print(f"Form submission successful: {success_message.text}")
 
 except Exception as e:
-    print("An error occurred during testing:", e)
-
+    print(f"An error occurred during testing: {e}")
+    driver.quit()
+    raise
 finally:
-    # Close the browser
     driver.quit()

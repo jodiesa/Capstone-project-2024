@@ -26,10 +26,14 @@ const userSchema = new mongoose.Schema(
         ref: 'Rental', // References the Rental model
       },
     ],
+    isAdmin: {
+      type: Boolean,
+      default: false, // By default, users are not admins
+    },
   },
   { timestamps: true }
 );
 
-const User = mongoose.model('User', userSchema);
 
-export default User;
+const User = mongoose.model('User', userSchema);
+export default User; // Ensure this line exists for a default export

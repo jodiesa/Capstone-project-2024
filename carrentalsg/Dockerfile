@@ -1,30 +1,27 @@
-# Use the latest Node.js image
+# Backend Stage
 FROM node:latest AS backend
 
 # Set up backend
 WORKDIR /app
-COPY package*.json ./
+COPY package*.json ./  
 RUN npm install
-COPY . .
+COPY . ./              
 
-WORKDIR /app/api
+WORKDIR /app/api       
 EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
-# Use a different stage for frontend
+# Frontend Stage
 FROM node:latest AS frontend
 
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci  # This will install with package-lock.json for reproducibility
-COPY . .
-
 WORKDIR /app/client
-RUN npm ci  # Install with package-lock.json in client directory as well
-RUN npm run build
+COPY client/package*.json ./  
+RUN rm -rf package-lock.json node_modules 
+RUN npm install
+COPY client/ ./          
 
-# Use Nginx to serve the frontend files
-FROM nginx:alpine
-COPY --from=frontend /app/client/build /usr/share/nginx/html
+EXPOSE 3001
+CMD ["npm", "run", "dev"]
 
-EXPOSE 80
+
+

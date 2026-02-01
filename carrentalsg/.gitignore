@@ -23,3 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Secrets
+key.json
+*.json
+.env
+service-account-key.json
