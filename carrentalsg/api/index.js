@@ -26,7 +26,7 @@ const app = express();
 // Enable CORS
 app.use(
   cors({
-    origin: '*', 
+    origin: 'http://localhost:5173', 
     credentials: true, // Allow cookies to be sent with requests
   })
 );
@@ -37,6 +37,8 @@ app.use(cookieParser());
 app.listen(3000, () => {
   console.log('Server is running on port 3000!');
 });
+
+
 
 
 

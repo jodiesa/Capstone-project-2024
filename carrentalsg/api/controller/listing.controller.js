@@ -62,15 +62,21 @@ export const updateListing = async (req, res, next) => {
 
 export const getListing = async (req, res, next) => {
   try {
+    if (!req.params.id || req.params.id === 'undefined') {
+      return res.status(400).json({ message: 'Invalid listing ID' });
+    }
+
     const listing = await Listing.findById(req.params.id);
     if (!listing) {
       return next(errorHandler(404, 'Listing not found!'));
     }
+
     res.status(200).json(listing);
   } catch (error) {
     next(error);
   }
 };
+
 
 export const getListings = async (req, res, next) => {
   try {

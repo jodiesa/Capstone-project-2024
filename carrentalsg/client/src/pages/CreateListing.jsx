@@ -139,31 +139,36 @@ export default function CreateListing() {
       }
   
       // Submit form data
-      const res = await fetch('/api/listing/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          imageUrls,
-          userRef: currentUser._id,
-        }),
-      });
-  
-      const data = await res.json();
-      if (data.success === false) {
-        setError(data.message);
-      } else {
-        navigate(`/listing/${data._id}`);
-      }
-    } catch (error) {
-      setError("Submission failed. Please try again.");
-      console.error(error);
-    } finally {
-      setLoading(false);
+   
+    const res = await fetch('/api/listing/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        ...formData,
+        imageUrls,
+        userRef: currentUser._id,
+      }),
+    });
+    const data = await res.json(); // <-- add this line BEFORE using 'data'
+
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      setError(errorData.message || 'Failed to create listing');
+      return;
     }
-  };
+
+    navigate(`/listing/${data._id}`);
+  } catch (error) {
+    console.error(error);
+    setError('Submission failed. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
   
   
   
