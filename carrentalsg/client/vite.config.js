@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3001,
     proxy: {
       '/api': {
-        target: 'http://backend:3000',  // matches your backend service name
+        target: 'http://localhost:3000',  // matches your backend service name
         changeOrigin: true,
         secure: false
       }
