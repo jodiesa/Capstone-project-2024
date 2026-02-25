@@ -1,9 +1,7 @@
-# Capstone-project-2024
-
 # Car E-commerce Website
 # 🚙 🚗
 ## About 
-this is the about section
+this is a mern stac
 ## Key Features
 ### User Features
 - Renting A car
@@ -15,11 +13,10 @@ https://capstone-project-2024-3.onrender.com
 - **Tailwind CSS**
 
 ### Technologies Used
-- MongoDB
-- Express.js
-- React
-- Node.js
-- Tailwind CSS
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
 
 ## testing done
 ## Future works
