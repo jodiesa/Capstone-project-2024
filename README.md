@@ -1,7 +1,7 @@
 # Car E-commerce Website
 # 🚙 🚗
 ## About 
-this is a mern stac
+this is a website created by MERN stack 
 ## Key Features
 ### User Features
 - Renting A car
