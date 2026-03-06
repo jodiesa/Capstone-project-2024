@@ -19,7 +19,7 @@ export default function Home() {
         const [offerRes, rentRes, saleRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/listing/get?offer=true&limit=10`),
           fetch(`${import.meta.env.VITE_API_URL}/api/listing/get?type=rent&limit=10`),
-          fetch('/api/listing/get?type=sale&limit=4')
+          fetch(`${import.meta.env.VITE_API_URL}/api/listing/get?type=sale&limit=4`)
         ]);
 
         const offerData = await offerRes.json();
