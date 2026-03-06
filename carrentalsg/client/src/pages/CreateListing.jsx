@@ -138,9 +138,9 @@ export default function CreateListing() {
         imageUrls = imageUrls.concat(urls);
       }
   
-      // Submit form data
+      // Submit form data fetch(`${import.meta.env.VITE_API_URL}/api/listing`)
    
-    const res = await fetch('/api/listing/create', {
+    const res = await fetch('${import.meta.env.VITE_API_URL}/api/listing/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
