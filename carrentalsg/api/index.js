@@ -26,7 +26,9 @@ const app = express();
 // Enable CORS
 app.use(
   cors({
-    origin: 'http://localhost:5173', 
+    origin: ['http://localhost:5173', 
+    "https://capstone-project-2024.pages.dev"],
+
     credentials: true, // Allow cookies to be sent with requests
   })
 );
