@@ -9,9 +9,6 @@ this is a website created by MERN stack
 ## Demo
 https://capstone-project-2024-3.onrender.com (currently redeploying the website, website might be down)
 
-- **MERN STACK**
-- **Tailwind CSS**
-
 ### Technologies Used
 | Category | Tech |
 |---------|------|
