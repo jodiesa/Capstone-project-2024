@@ -7,7 +7,7 @@ this is a website created by MERN stack
 - Renting A car
 - Updating user details 
 ## Demo
-https://capstone-project-2024-3.onrender.com
+https://capstone-project-2024-3.onrender.com (currently redeploying the website, website might be down)
 
 - **MERN STACK**
 - **Tailwind CSS**
@@ -22,9 +22,6 @@ https://capstone-project-2024-3.onrender.com
 
 
 
-
-## testing done
-## Future works
 
 ### Setup Instructions
 1. Clone the repository.
